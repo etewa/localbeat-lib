@@ -59,18 +59,21 @@ public class DistanceUtil {
 	 * @param end
 	 * @return
 	 */
-	public double getDistanceBetweenPoints(Coordinate start, Coordinate end) {
+    public double getDistanceBetweenPoints(Coordinate start, Coordinate end) {
+        double lat1 = Math.toRadians(start.getLatitude());
+        double lon1 = Math.toRadians(start.getLongitude());
+        double lat2 = Math.toRadians(end.getLatitude());
+        double lon2 = Math.toRadians(end.getLongitude());
+        
 		DecimalFormat df = new DecimalFormat("#.##");
 		df.setRoundingMode(RoundingMode.HALF_UP);
-		var radius = 6371; // Radius of the earth in km
-		var dLat = deg2rad(end.getLatitude() - start.getLatitude()); // deg2rad below
-		var dLon = deg2rad(end.getLongitude() - start.getLongitude());
-		var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(deg2rad(start.getLatitude()))
-				* Math.cos(deg2rad(end.getLatitude())) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
 		
-		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-		return Double.valueOf(df.format((radius * c) * .6213712));
-	}
+        double dlon = lon2 - lon1;
+        double dlat = lat2 - lat1;
+        double a = Math.pow(Math.sin(dlat / 2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(dlon / 2), 2);
+        double c = 2 * Math.asin(Math.sqrt(a));
+        return Double.valueOf(df.format(6371 * c * 0.62137));
+    }
 	
 	/**
 	 * Earth radius at a given latitude, according to the WGS-84 ellipsoid [m]
@@ -78,7 +81,7 @@ public class DistanceUtil {
 	 * @param lat
 	 * @return
 	 */
-	protected double earthRadius(double lat) {
+	private double earthRadius(double lat) {
 	    var an = WGS84_A * WGS84_A * Math.cos(lat);
 	    var bn = WGS84_B * WGS84_B * Math.sin(lat);
 	    var ad = WGS84_A * Math.cos(lat);
@@ -91,7 +94,7 @@ public class DistanceUtil {
 	 * @param degrees
 	 * @return
 	 */
-	protected double deg2rad(double degrees) {
+	private double deg2rad(double degrees) {
 	    return Math.PI * degrees / 180.0;
 	}
 
@@ -100,7 +103,7 @@ public class DistanceUtil {
 	 * @param radians
 	 * @return
 	 */
-	protected double rad2deg(double radians) {
+	private double rad2deg(double radians) {
 	    return 180.0 * radians / Math.PI;
 	}
 
